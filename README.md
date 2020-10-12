@@ -24,7 +24,7 @@ BOT_TOKEN="token bota do discorda"
 
 3. Pobierz wymagane moduły pythona:
 `python3 -m pip install rauth requests  discord.py python-dotenv`
-4. `apt install screen`
+4. Zainstaluj okienka w tle: `apt install screen`
 5. Wpisz `crontab -e` i dodaj wartość:
 `@reboot cd /sciezka_do_pobranego_repo && screen -dmS usos -U python3 skrypt.py`
 6. Zrestartuj serwer komendą __reboot__, twój bot uruchamia się wraz z serwerem VPS ;)

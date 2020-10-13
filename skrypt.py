@@ -31,6 +31,7 @@ async def zaloguj(ctx):
 		sesja = sesje[ajdi]
 		response = sesja.get(base_url+'services/users/user')
 		print(response.json())
+		await ctx.send("Jestes już zalogowany!")
 	except:
 		global oauth
 		oauth = rauth.OAuth1Service(consumer_key=client_key, consumer_secret=client_secret, name="DiscordBot", request_token_url=request_token_url, authorize_url=authorize_url, access_token_url=access_token_url)
@@ -45,15 +46,18 @@ async def zaloguj(ctx):
 
 @bot.command()
 async def pin(ctx, pin : str):
-	ajdi = str(ctx.message.author.id)
-	params2 = {"oauth_verifier": pin}
-	auth = oauth.get_auth_session(request_token, request_token_secret, params=params2)
-	global sesje
-	sesje[ajdi] = auth
-	access_token = auth.access_token
-	access_token_secret = auth.access_token_secret
-	response = auth.get(base_url+"services/users/user")
-	await ctx.send("Zalogowano!")
+	try:
+		ajdi = str(ctx.message.author.id)
+		params2 = {"oauth_verifier": pin}
+		auth = oauth.get_auth_session(request_token, request_token_secret, params=params2)
+		global sesje
+		sesje[ajdi] = auth
+		access_token = auth.access_token
+		access_token_secret = auth.access_token_secret
+		response = auth.get(base_url+"services/users/user")
+		await ctx.send("Zalogowano!")
+	except:
+		await ctx.send("Błąd. Spróbuj wpisać !zaloguj")
 
 @bot.command()
 async def oceny(ctx):
@@ -75,21 +79,31 @@ async def egzaminy(ctx):
 
 @bot.command()
 async def plan(ctx):
-	'''
 	ajdi = str(ctx.message.author.id)
 	try:
 		global sesja
 		sesja = sesje[ajdi]
 		response = sesja.get(base_url+"services/tt/user")
-		await ctx.send(response.json())
+		embed = discord.Embed(
+			title="Twój plan zajęć",
+			color=0x00FFFB)
+		for przedmiot in response.json():
+			dzejson = dict(przedmiot)
+			for klucz in dzejson:
+				if klucz == "name":
+					rozbij = dict(dzejson[klucz])
+					przedmiot = rozbij['pl']
+					embed.add_field(name="Przedmiot", inline=True, value=przedmiot)
+				if klucz == "start_time":
+					embed.add_field(name="Data rozpoczęcia", inline=True, value=dzejson[klucz])
+				if klucz == "end_time":
+					embed.add_field(name="Data zakończenia", inline=True, value=dzejson[klucz])
+		await ctx.send(embed=embed)
 	except:
-		await ctx.send("Musisz być zalogowany. Wpisz !zaloguj")
-	'''
-	await ctx.send("Jeszcze nie działa, dopóki uczelnia czegoś nie doda...")
+		await ctx.send("Jakiś błąd, jesteś zalogowany?")
 
 @bot.command()
 async def wiadomosci(ctx):
-	'''
 	ajdi = str(ctx.message.author.id)
 	try:
 		global sesja
@@ -98,8 +112,6 @@ async def wiadomosci(ctx):
 		await ctx.send(response.json())
 	except:
 		await ctx.send("Musisz być zalogowany. Wpisz !zaloguj")
-	'''
-	await ctx.send("Jeszcze nie działa...")
 
 @bot.command()
 async def usos(ctx):

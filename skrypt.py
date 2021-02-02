@@ -6,7 +6,6 @@ from discord.ext import commands, tasks
 from dotenv import load_dotenv
 import os
 import datetime
-import asyncio
 
 load_dotenv()
 client_key = os.getenv("CLIENT_KEY")
@@ -166,7 +165,6 @@ async def odnowsesje():
 						ocenki[ajdi] = ile
 	with open("ocenki.json", "w", encoding='utf-8') as zapisz_ocenki:
 		json.dump(ocenki, zapisz_ocenki, ensure_ascii=False, indent=4)
-	await asyncio.sleep(60)
 
 @bot.command()
 async def przedmioty(ctx):

@@ -1,12 +1,12 @@
 # usos-discord
 Połączenie Discord Bot'a z USOS
 Komendy:
-!usos - lista komend bota
-!zaloguj - rozpoczęcie logowania/wznowienia sesji/odnowienia
-!pin twojpin - kontynuacja logowania
-!oceny - wysyła w prywatnej wiadomości listę ocen z USOS'a
-!przedmioty - pokazuje przedmioty w danym semestrze
-!plan - wypisuje plan zajęć na najbliższy tydzień
+- !usos - lista komend bota
+- !zaloguj - rozpoczęcie logowania/wznowienia sesji/odnowienia
+- !pin twojpin - kontynuacja logowania
+- !oceny - wysyła w prywatnej wiadomości listę ocen z USOS'a
+- !przedmioty - pokazuje przedmioty w danym semestrze i kto je prowadzi
+- !plan - wypisuje plan zajęć na najbliższy tydzień
 
 Bot sprawdza też co 10 minut i informuje zalogowane na nim osoby poszczególnie w prywatnej wiadomości o nowo wstawionej ocenie na USOS.
 ### Co jest potrzebne?

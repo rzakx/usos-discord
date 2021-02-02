@@ -133,7 +133,7 @@ async def oceny(ctx):
 													tag = przedmiot2[klucz2]
 					if klucz == "value_symbol":
 						ocenka = "Ocena: "+str(dzejson[klucz])
-						suma=suma+float(dzejson[klucz])
+						suma=suma+float(dzejson[klucz].replace(",", "."))
 				embed.add_field(name=nazwaprzedmiotu, inline=False, value=f"{tag} - {ocenka}")
 		srednia = suma/ile
 		embed.set_footer(text=f"Średnia: {srednia:.2f}")

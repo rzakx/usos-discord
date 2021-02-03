@@ -34,10 +34,10 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 @bot.event
 async def on_ready():
 	print("Zalogowano jako {0}!".format(bot.user.name))
-	print(zapisane)
 	odnowsesje.start()
+	await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="!usos"), status=discord.Status.online)
 
-@bot.command()
+@bot.command(brief="Rozpoczęcie logowania lub wznowienie sesji")
 async def zaloguj(ctx):
 	ajdi = str(ctx.message.author.id)
 	global sesje
@@ -45,7 +45,7 @@ async def zaloguj(ctx):
 	global zapisane
 	try:
 		if ajdi in zapisane:
-			print("Probuje przywrocic sesje")
+			print(ajdi, "wpisał !zaloguj, próbuję wznowić sesję.")
 			at = zapisane[ajdi]['at']
 			ats = zapisane[ajdi]['ats']
 			auth = rauth.OAuth1Session(consumer_key=client_key, consumer_secret=client_secret, access_token=at, access_token_secret=ats)
@@ -54,7 +54,7 @@ async def zaloguj(ctx):
 			await ctx.send(f'Wznowiono poprzednia sesje logowania.')
 			print("Udane")
 		else:
-			print("Nieudane, tworze nowa")
+			print("Tworzę nową sesje dla", ajdi)
 			oauth = rauth.OAuth1Service(consumer_key=client_key, consumer_secret=client_secret, name="DiscordBot", request_token_url=request_token_url, authorize_url=authorize_url, access_token_url=access_token_url)
 			params = {'oauth_callback': 'oob', 'scopes': SCOPES}
 			tokeny = oauth.get_request_token(params=params)
@@ -65,9 +65,18 @@ async def zaloguj(ctx):
 			await ctx.author.send("Odwiedź poniższy link i odpisz mi: !pin twojpin")
 			await ctx.author.send(url)
 	except:
-		await ctx.send("Wystąpił jakiś kurcze błąd.")
+		print("Tworzę nową sesje dla", ajdi)
+		oauth = rauth.OAuth1Service(consumer_key=client_key, consumer_secret=client_secret, name="DiscordBot", request_token_url=request_token_url, authorize_url=authorize_url, access_token_url=access_token_url)
+		params = {'oauth_callback': 'oob', 'scopes': SCOPES}
+		tokeny = oauth.get_request_token(params=params)
+		request_token, request_token_secret = tokeny
+		zapisane[ajdi] = {'rt': request_token, 'rts': request_token_secret}
+		url = oauth.get_authorize_url(request_token)
+		await ctx.send("Wysłano link w prywatnej wiadomości.")
+		await ctx.author.send("Odwiedź poniższy link i odpisz mi: !pin twojpin")
+		await ctx.author.send(url)
 
-@bot.command()
+@bot.command(brief="Kontynuacja logowania")
 async def pin(ctx, *pin):
 	global zapisane
 	try:
@@ -83,7 +92,6 @@ async def pin(ctx, *pin):
 			auth = oauth.get_auth_session(zapisane[ajdi]['rt'], zapisane[ajdi]['rts'], params=params2)
 			global sesje
 			sesje[ajdi] = auth
-			#zapisywanie do pliku
 			access_token = auth.access_token
 			access_token_secret = auth.access_token_secret
 			zapisane[ajdi]['at'] = access_token
@@ -96,9 +104,10 @@ async def pin(ctx, *pin):
 	except:
 		await ctx.send("Błąd. Spróbuj od nowa !zaloguj")
 
-@bot.command()
+@bot.command(brief="Wysyla w prywatnej wiadomości listę ocen")
 async def oceny(ctx):
 	ajdi = str(ctx.message.author.id)
+	print(ajdi, "wpisał !oceny")
 	try:
 		global sesja
 		sesja = sesje[ajdi]
@@ -132,19 +141,21 @@ async def oceny(ctx):
 													nazwaprzedmiotu = przedmiot2['course_name']['pl']
 													tag = przedmiot2[klucz2]
 					if klucz == "value_symbol":
-						ocenka = "Ocena: "+str(dzejson[klucz])
+						ocenka = "Ocena: "+str(dzejson[klucz].replace(",", "."))
 						suma=suma+float(dzejson[klucz].replace(",", "."))
 				embed.add_field(name=nazwaprzedmiotu, inline=False, value=f"{tag} - {ocenka}")
 		srednia = suma/ile
 		embed.set_footer(text=f"Średnia: {srednia:.2f}")
 		await ctx.author.send(embed=embed)
+		await ctx.message.add_reaction("✉️")
 	except:
 		await ctx.send("Jakiś błąd. Jesteś zalogowany?")
+
 @tasks.loop(seconds=600.0)
 async def odnowsesje():
 	for ajdi in zapisane:
 		if "ats" in zapisane[ajdi]:
-			print("Probuje przywrocic sesje dla ", ajdi)
+			print("Probuje przywrocic sesje dla", ajdi)
 			at = zapisane[ajdi]['at']
 			ats = zapisane[ajdi]['ats']
 			auth = rauth.OAuth1Session(consumer_key=client_key, consumer_secret=client_secret, access_token=at, access_token_secret=ats)
@@ -156,19 +167,22 @@ async def odnowsesje():
 				ile = 0
 				for ocena in response.json():
 					ile = ile + 1
-					if ajdi in ocenki:
-						if int(ocenki[ajdi]) < ile:
-							ocenki[ajdi] = ile
-							user = bot.get_user(int(ajdi))
-							await user.send("Hej "+user.name+"! Na USOSie pojawiła się nowa ocena! Sprawdź wpisując !oceny")
-					else:
+				if ajdi in ocenki:
+					if int(ocenki[ajdi]) < ile:
 						ocenki[ajdi] = ile
+						user = bot.get_user(int(ajdi))
+						await user.send("Hej "+user.name+"! Na USOSie pojawiła się nowa ocena! Sprawdź wpisując !oceny")
+				else:
+					ocenki[ajdi] = ile
+			else:
+				ocenki[ajdi]=0
 	with open("ocenki.json", "w", encoding='utf-8') as zapisz_ocenki:
 		json.dump(ocenki, zapisz_ocenki, ensure_ascii=False, indent=4)
 
-@bot.command()
+@bot.command(brief="Wysyła w prywatnej wiadomości listę przedmiotów w danym semestrze")
 async def przedmioty(ctx):
 	ajdi = str(ctx.message.author.id)
+	print(ajdi, "wpisał !przedmioty")
 	global sesja
 	sesja = sesje[ajdi]
 	odp = sesja.get(base_url+"services/courses/user")
@@ -191,9 +205,10 @@ async def przedmioty(ctx):
 					kurs_id = przedmiot[klucz]
 			wartosc = f"{kurs_id} - {wykladowca}"
 			embed.add_field(name=nazwaprzedmiotu, inline=False, value=wartosc)
-	await ctx.send(embed=embed)
+	await ctx.author.send(embed=embed)
+	await ctx.message.add_reaction("✉️")
 
-@bot.command()
+@bot.command(brief="Wysyła w prywatnej wiadomości twój plan zajęć na najbliższy tydzień")
 async def plan(ctx):
 	ajdi = str(ctx.message.author.id)
 	try:
@@ -228,22 +243,12 @@ async def plan(ctx):
 					dzien = dnitygodnia[int(nrdzien)]
 					wartosc = f"{rozpoczecie[0]} ({dzien}) {rozpoczecie[1][0:5]} - {zakonczenie[1][0:5]}"
 					embed.add_field(name=przedmiot, inline=False, value=wartosc)
-			await ctx.send(embed=embed)
+			await ctx.author.send(embed=embed)
+			await ctx.message.add_reaction("✉️")
 	except:
 		await ctx.send("Jakiś błąd, jesteś zalogowany?")
 
-@bot.command()
-async def wiadomosci(ctx):
-	ajdi = str(ctx.message.author.id)
-	try:
-		global sesja
-		sesja = sesje[ajdi]
-		response = sesja.get(base_url+"services/news/search")
-		await ctx.send(response.json())
-	except:
-		await ctx.send("Musisz być zalogowany. Wpisz !zaloguj")
-
-@bot.command()
+@bot.command(brief="Lista komend")
 async def usos(ctx):
 	embed = discord.Embed(
 		title="Komendy bota USOS",
@@ -251,10 +256,8 @@ async def usos(ctx):
 	embed.add_field(name="Rozpoczęcie logowania", inline=True, value="!zaloguj")
 	embed.add_field(name="Kontynuacja logowania", inline=True, value="!pin twojpin")
 	embed.add_field(name="Pokaż swój plan zajęć", inline=False, value="!plan")
-	#embed.add_field(name="Pokaż wiadomości od uczelni", inline=False, value="!wiadomosci")
 	embed.add_field(name="Pokaż swoje oceny", inline=True, value="!oceny")
 	embed.add_field(name="Pokaż swoje przedmioty", inline=True, value="!przedmioty")
-	#embed.add_field(name="Pokaż nadchodzące egzaminy", inline=False, value="!egzaminy")
 	await ctx.send(embed=embed)
 
 tokenisko = os.getenv("BOT_TOKEN")

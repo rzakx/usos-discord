@@ -1,16 +1,23 @@
 # usos-discord
-Połączenie Discord Bot'a z USOS
+Połączenie Discord i USOSweb.
+
+### Funkcjonalność Bota:
+Dzięki mnie nie musisz się logować co chwilę na USOSweb, by sprawdzić podstawowe informacje takie jak plan zajęć, oceny, średnia, informacje o semestrze.
+Dodatkowo na USOSweb powiadomienia o nowych ocenach nie istnieją, a dzięki usos-discord powiadomienie o nowo wstawionej ocenie dostaniesz automatycznie w prywatnej wiadomości.
+Wszystkie wrażliwe dane wysyłane są do Ciebie na pw, a logowanie odbywa się tylko raz i na stronie uczelni.
+Bot nie przechowuje twojego hasła, peselu, loginu itd, tylko PIN i aktywną sesje z API systemu USOSweb, którą stara się podtrzymać jak najdłużej, aby nie było potrzeby przechodzenia przez proces logowania ponownie za każdym razem gdy chcesz wyświetlić na szybko np. plan zajęć.
+
 Komendy:
 - !usos - lista komend bota
 - !zaloguj - rozpoczęcie logowania/wznowienia sesji/odnowienia
 - !pin twojpin - kontynuacja logowania
 - !oceny - wysyła w prywatnej wiadomości listę ocen z USOS'a
 - !przedmioty - pokazuje przedmioty w danym semestrze i kto je prowadzi
-- !plan - wypisuje plan zajęć na najbliższy tydzień
-
-Bot sprawdza też co 10 minut i informuje zalogowane na nim osoby poszczególnie w prywatnej wiadomości o nowo wstawionej ocenie na USOS.
+- !plan - wypisuje plan zajęć na najbliższe dni 3-7 dni
+- !semestr - wyświetla datę rozpoczęcia, datę zakończenia i ID aktualnego semestru
+ 
 ### Co jest potrzebne?
-Serwer VPS Linux Debian
+Serwer aby skrypt Bota działał 24/7
 
 Konto Bota na Discordzie:
 - https://discordapp.com/developers
@@ -21,7 +28,7 @@ Konto Bota na Discordzie:
 
 Klucz API do USOS'a otrzymasz ze strony swojej uczelni: https://api.STRONAUCZELNI.pl/usosapps/developers/
 
-### Konfiguracja
+### Konfiguracja (Linux Debian)
 1. Pobierz repo na swój serwer.
 2. Utwórz plik __.env__ i umieśc w nim takie wartości:
 

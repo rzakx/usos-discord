@@ -2,10 +2,10 @@
 Połączenie Discord i USOSweb.
 
 ### Funkcjonalność Bota:
-Dzięki mnie nie musisz się logować co chwilę na USOSweb, by sprawdzić podstawowe informacje takie jak plan zajęć, oceny, średnia, informacje o semestrze.
+Dzięki mnie ty i twoi znajomi ze studiów nie musicie się logować co chwilę na USOSweb, by sprawdzić podstawowe informacje takie jak plan zajęć, oceny, średnia, informacje o semestrze.
 Dodatkowo na USOSweb powiadomienia o nowych ocenach nie istnieją, a dzięki usos-discord powiadomienie o nowo wstawionej ocenie dostaniesz automatycznie w prywatnej wiadomości.
-Wszystkie wrażliwe dane wysyłane są do Ciebie na pw, a logowanie odbywa się tylko raz i na stronie uczelni.
-Bot nie przechowuje twojego hasła, peselu, loginu itd, tylko PIN i aktywną sesje z API systemu USOSweb, którą stara się podtrzymać jak najdłużej, aby nie było potrzeby przechodzenia przez proces logowania ponownie za każdym razem gdy chcesz wyświetlić na szybko np. plan zajęć.
+Wszystkie wrażliwe dane wysyłane są do na pw, a logowanie odbywa się tylko raz i na stronie uczelni.
+Bot nie przechowuje hasła, peselu, loginu itd, tylko PIN i aktywną sesje z API systemu USOSweb, którą stara się podtrzymać jak najdłużej, aby nie było potrzeby przechodzenia przez proces logowania ponownie za każdym razem gdy chcesz wyświetlić na szybko np. plan zajęć.
 
 Komendy:
 - !usos - lista komend bota

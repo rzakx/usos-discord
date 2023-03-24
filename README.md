@@ -1,4 +1,4 @@
-# usos-discord
+# usos-discord **OUTDATED**
 Połączenie Discord i USOSweb.
 
 ### Funkcjonalność Bota:
